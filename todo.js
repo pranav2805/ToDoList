@@ -12,14 +12,22 @@ window.addEventListener("DOMContentLoaded", () => {
             const todoList = response.data;
             const todoListRem = document.getElementById("todoRem");
             const todoListDone = document.getElementById("todoDone");
-            for(let i=0;i<todoList.length;i++){
-                if(todoList[i].isDone){
-                    showToDoDone(todoList[i]);
+            // for(let i=0;i<todoList.length;i++){
+            //     if(todoList[i].isDone){
+            //         showToDoDone(todoList[i]);
+            //     }
+            //     else{
+            //         showToDoRem(todoList[i]);
+            //     }
+            // }
+            todoList.forEach(todo => {
+                if(todo.isDone){
+                    showToDoDone(todo);
                 }
                 else{
-                    showToDoRem(todoList[i]);
+                    showToDoRem(todo);
                 }
-            }
+            })
         })
         .catch(err => {console.log(err)});
 })
@@ -51,9 +59,9 @@ function onSubmit(e){
 
 function showToDoRem(obj){
     const parentElement = document.getElementById("todoRem")
-    const childHTML = `<li id=${obj._id}> ${obj.todo} - ${obj.desc}
-                       <button onclick=moveToToDoDone('${obj}')>Done</button>
-                       <button onclick=deleteToDo('${obj._id}')>Delete</button>
+    const childHTML = `<li id='${obj._id}'> ${obj.todo} - ${obj.desc}
+                       <button onclick="moveToToDoDone('${obj._id}','${obj.todo}','${obj.desc}')">Done</button>
+                       <button onclick="deleteToDo('${obj._id}')">Delete</button>
                        </li>`
     
     parentElement.innerHTML = parentElement.innerHTML + childHTML;
@@ -77,12 +85,26 @@ function showToDoRem(obj){
     // parentElement.appendChild(li);
 
     // deleteBtn.onclick = () => {
-    //     axios.delete(`https://crudcrud.com/api/b1afff3264634be79b544c329fcd2fa3/todoList/${obj._id}`)
-    //     .then(response => {
-    //         console.log("Deletion was successful");
-    //         parentElement.removeChild(li);
-    //     })
-    //     .catch(err => console.log(err))
+    //     axios.delete(`https://crudcrud.com/api/1ff31f45e7aa4869b172d87d46f225da/todoList/${obj._id}`)
+    //         .then(response => {
+    //             console.log("Deletion was successful");
+    //             parentElement.removeChild(li);
+    //         })
+    //         .catch(err => console.log(err))
+    // }
+
+    // doneBtn.onclick = () => {
+    //     let new_obj = {
+    //         todo: obj.todo,
+    //         desc: obj.desc,
+    //         isDone: true
+    //     }
+    //     axios.put("https://crudcrud.com/api/1ff31f45e7aa4869b172d87d46f225da/todoList/"+obj._id,new_obj)
+    //         .then(response => {
+    //             parentElement.removeChild(li);
+    //             showToDoDone(obj)
+    //         })
+    //         .catch(err => console.log(err))
     // }
 
 }
@@ -106,13 +128,19 @@ function deleteToDo(id){
         .catch(err => console.log(err))
 }
 
-function moveToToDoDone(obj){
+function moveToToDoDone(id,todo,desc){
     const parentElement = document.getElementById("todoRem");
-    const childElement = document.getElementById(`${obj._id}`);
-    axios.put(`https://crudcrud.com/api/1ff31f45e7aa4869b172d87d46f225da/todoList/${obj._id}`,({...obj, isDone: true}))
+    const childElement = document.getElementById(id);
+    //console.log("move element")
+    let new_obj = {
+        todo: todo,
+        desc: desc,
+        isDone: true
+    }
+    axios.put("https://crudcrud.com/api/1ff31f45e7aa4869b172d87d46f225da/todoList/"+id,new_obj)
         .then(response => {
             parentElement.removeChild(childElement);
-            showToDoDone(obj)
+            showToDoDone({...new_obj,id})
         })
         .catch(err => console.log(err))
 }
